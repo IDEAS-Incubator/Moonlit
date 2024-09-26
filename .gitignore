@@ -1,0 +1,20 @@
+# frontend
+frontend/node_modules
+frontend/dist
+frontend/dist-ssr
+frontend/*.local
+
+# backend
+backend/.env
+backend/node_modules
+backend/dist
+
+# Local Netlify folder
+.netlify
+
+backend/env
+backend/output
+
+
+#doc
+doc/*.png
