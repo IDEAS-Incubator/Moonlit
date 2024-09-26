@@ -1,20 +1,37 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
 # frontend
-frontend/node_modules
-frontend/dist
-frontend/dist-ssr
-frontend/*.local
+frontend/comic-dreams/node_modules
+frontend/comic-dreams/dist
+frontend/comic-dreams/dist-ssr
+frontend/comic-dreams/*.local
+frontend/comic-dreams/.next
+
+# Ignore Next.js build files
+.next/
+
 
 # backend
 backend/.env
 backend/node_modules
 backend/dist
-
-# Local Netlify folder
-.netlify
-
 backend/env
 backend/output
-
-
-#doc
-doc/*.png
