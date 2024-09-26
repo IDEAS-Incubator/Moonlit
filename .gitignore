@@ -28,6 +28,8 @@ frontend/comic-dreams/.next
 # Ignore Next.js build files
 .next/
 
+client/doc
+
 
 # backend
 backend/.env
