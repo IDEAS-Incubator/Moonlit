@@ -48,7 +48,7 @@ export default function TryBetaPage() {
 
     // Check if the scenario has between 50 and 300 words
     const wordCount = countWords(scenario);
-    if (wordCount < 50 || wordCount > 300) {
+    if (wordCount < 30 || wordCount > 300) {
       toast.error("Scenario must be between 50 and 300 words.");
       return; // Exit early if validation fails
     }
@@ -128,7 +128,7 @@ export default function TryBetaPage() {
 
           {/* Scenario Input as Textarea */}
           <div>
-            <label htmlFor="scenario" className="block text-sm font-medium mb-2">Scenario (50-300 words)</label>
+            <label htmlFor="scenario" className="block text-sm font-medium mb-2">Scenario (30-300 words)</label>
             <textarea
               id="scenario"
               placeholder="Alice and Bob find a mysterious cave"
