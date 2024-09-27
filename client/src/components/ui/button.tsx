@@ -1,12 +1,9 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { type VariantProps } from "class-variance-authority";
-
+import { cn } from "@/lib/utils";
 // Utility function to merge class names
-const cn = (...classes: string[]) => classes.filter(Boolean).join(" ");
-
+// Define inline styles for the button variants and sizes
 const buttonVariants = (variant?: string, size?: string) => {
-  // Define inline styles for the button variants and sizes
   const styles: Record<string, React.CSSProperties> = {
     default: {
       backgroundColor: "#1d4ed8", // Primary color (e.g., blue)
@@ -55,20 +52,21 @@ const buttonVariants = (variant?: string, size?: string) => {
 };
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  size?: "default" | "sm" | "lg" | "icon";
   asChild?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant = "default", size = "default", asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
     const buttonStyle = buttonVariants(variant, size);
 
     return (
       <Comp
         style={buttonStyle}
-        className={cn(className || "")} // Keep custom classNames if any
+        className={cn(className)} // Keep custom classNames if any
         ref={ref}
         {...props}
       />
@@ -78,4 +76,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = "Button";
 
-export { Button, buttonVariants };
+export { Button };

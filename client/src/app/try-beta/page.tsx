@@ -105,7 +105,8 @@ export default function TryBetaPage() {
         <section className="text-center mb-8 px-4">
             <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-4 leading-relaxed">
                 Welcome to ComicDreams Beta! We are excited to offer you the opportunity to experience our AI-driven comic generator.
-                Use the form below to create your own personalized comic stories in a few simple steps. It's quick, fun, and designed to inspire creativity!
+                Use the form below to create your own personalized comic stories in a few simple steps. It&rsquo;s quick, fun, and designed to inspire creativity!
+
             </p>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
                 Just enter a scenario, choose a style, and provide your email. We will send you the generated comic, and you can view or download it instantly.
