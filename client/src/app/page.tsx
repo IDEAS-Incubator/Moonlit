@@ -19,7 +19,7 @@ export default function Home() {
         <CTASection />
       </main>
       <footer className="container mx-auto py-6 text-center text-muted-foreground">
-        <p>&copy; 2024 ComicDreams. All rights reserved.</p>
+        <p>&copy; 2024 Moonlit. All rights reserved.</p>
       </footer>
     </div>
   )

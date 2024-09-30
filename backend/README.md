@@ -1,4 +1,4 @@
-# ComicDreams
+# Moonlit
 
 This program uses Generative AI to create an entire comic strip from a short scenario or generate bedtime reading e-books with soothing content.
 

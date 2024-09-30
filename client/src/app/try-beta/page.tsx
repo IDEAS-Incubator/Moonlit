@@ -100,11 +100,11 @@ export default function TryBetaPage() {
       <Header />
 
       <main className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-12 text-center">Try ComicDreams Beta</h1>
+        <h1 className="text-4xl font-bold mb-12 text-center">Try Moonlit Beta</h1>
 
         <section className="text-center mb-8 px-4">
             <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-4 leading-relaxed">
-                Welcome to ComicDreams Beta! We are excited to offer you the opportunity to experience our AI-driven comic generator.
+                Welcome to Moonlit Beta! We are excited to offer you the opportunity to experience our AI-driven comic generator.
                 Use the form below to create your own personalized comic stories in a few simple steps. It&rsquo;s quick, fun, and designed to inspire creativity!
 
             </p>

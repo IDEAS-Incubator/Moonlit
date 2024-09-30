@@ -97,7 +97,7 @@ def send_email_with_attachment(to_email: str, pdf_file_path: str):
     msg = MIMEMultipart()
     msg['From'] = EMAIL_USER
     msg['To'] = to_email
-    msg['Subject'] = "Your Comic Book from ComicDreams"
+    msg['Subject'] = "Your Comic Book from Moonlit"
 
     body = MIMEText("Here is your comic book. Enjoy!")
     msg.attach(body)

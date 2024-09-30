@@ -6,9 +6,9 @@ export default function Footer() {
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* About Section */}
         <div>
-          <h3 className="text-white text-lg font-bold mb-4">About ComicDreams</h3>
+          <h3 className="text-white text-lg font-bold mb-4">About Moonlit</h3>
           <p className="text-gray-400">
-            ComicDreams brings your favorite comic characters to life. Our platform allows users to create and share comic strips using AI-generated illustrations, making it easy to turn imagination into reality.
+            Moonlit brings your favorite comic characters to life. Our platform allows users to create and share comic strips using AI-generated illustrations, making it easy to turn imagination into reality.
           </p>
         </div>
 
@@ -26,7 +26,7 @@ export default function Footer() {
 
       {/* Footer Bottom Text */}
       <div className="border-t border-gray-700 mt-8 pt-4 text-center">
-        <p>© 2024 ComicDreams | All Rights Reserved</p>
+        <p>© 2024 Moonlit | All Rights Reserved</p>
       </div>
     </footer>
   );
