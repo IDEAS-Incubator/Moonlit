@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException,Response
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from email.mime.multipart import MIMEMultipart
@@ -29,10 +29,10 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://3.142.114.5"],
+    allow_origins=["http://3.142.114.5"],  # Allows all origins
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
 )
 
 # Define the request body model
@@ -121,6 +121,16 @@ def send_email_with_attachment(to_email: str, pdf_file_path: str):
     except Exception as e:
         print(f"Failed to send email: {e}")
         return False
+
+# Preflight Request Handler (OPTIONS) for /send_comic_email/
+@app.options("/send_comic_email/")
+async def handle_options():
+    return Response(status_code=200, headers={
+        "Access-Control-Allow-Origin": "http://3.142.114.5",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Credentials": "true"
+    })
 
 
 # Define an API endpoint to send the comic via email
