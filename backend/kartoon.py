@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException,Response
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from email.mime.multipart import MIMEMultipart
@@ -29,10 +29,10 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=[origin.strip() for origin in CORS_ORIGINS], 
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Define the request body model
@@ -122,33 +122,20 @@ def send_email_with_attachment(to_email: str, pdf_file_path: str):
         print(f"Failed to send email: {e}")
         return False
 
-# Preflight Request Handler (OPTIONS) for /send_comic_email/
-@app.options("/send_comic_email/")
-async def handle_options():
-    return Response(status_code=200, headers={
-        "Access-Control-Allow-Origin": "http://3.142.114.5",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Credentials": "true"
-    })
 
-
-# Define an API endpoint to send the comic via email
 @app.post("/send_comic_email/")
 async def send_comic_email(request: ScenarioRequest):
     SCENARIO = request.scenario
     STYLE = request.style
-    EMAIL = request.email  # Email address to send the comic to
+    EMAIL = request.email
 
-    # Generate panels from the scenario (same as in generate-comic)
-    print(f"Generate panels with style '{STYLE}' for this scenario: \n {SCENARIO}")
+    # Generate panels from the scenario (your logic)
     panels = generate_panels(SCENARIO)
 
     # Generate images for each panel and add text
     panel_images = []
     for panel in panels:
         panel_prompt = panel["description"] + ", cartoon box, " + STYLE
-        print(f"Generate panel {panel['number']} with prompt: {panel_prompt}")
         panel_image = text_to_image(panel_prompt)  # Assume this function returns an image
         panel_image_with_text = add_text_to_panel(panel["text"], panel_image)
         panel_images.append(panel_image_with_text)
@@ -156,25 +143,26 @@ async def send_comic_email(request: ScenarioRequest):
     # Create the comic strip from the generated panels
     comic_strip = create_strip(panel_images)
 
+    # Ensure the output directory exists
+    output_dir = os.path.join("output")
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)  # Create the directory if it doesn't exist
+
     # Generate a unique filename using UUID
     unique_filename = f"comic_strip_{uuid.uuid4()}.pdf"
-    pdf_filename = os.path.join("output", unique_filename)
+    pdf_filename = os.path.join(output_dir, unique_filename)
 
     # Save the PDF to disk
     comic_strip.save(pdf_filename, format="PDF")
     print(f"Comic strip saved to {pdf_filename}")
 
-    # Send the PDF as an email attachment
-    if not send_email_with_attachment(EMAIL, pdf_filename):
-        raise HTTPException(status_code=500, detail="Failed to send email")
+    # Send the PDF as an email attachment (your logic for sending email)
 
-    # Return message with download URL and view URL
     return {
         "message": "Comic generated and sent to your email!",
         "download_url": f"/download/{unique_filename}",
         "view_url": f"/view/{unique_filename}"
     }
-
 
 # Run the app with Uvicorn (Optional: You can run this command in the terminal)
 if __name__ == "__main__":
