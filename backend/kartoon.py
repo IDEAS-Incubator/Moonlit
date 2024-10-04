@@ -157,6 +157,8 @@ async def send_comic_email(request: ScenarioRequest):
     print(f"Comic strip saved to {pdf_filename}")
 
     # Send the PDF as an email attachment (your logic for sending email)
+    if not send_email_with_attachment(EMAIL, pdf_filename):
+        raise HTTPException(status_code=500, detail="Failed to send email")
 
     return {
         "message": "Comic generated and sent to your email!",
