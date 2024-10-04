@@ -21,6 +21,7 @@ from dotenv import load_dotenv
 load_dotenv()
 # Fetch CORS origins from the environment variable
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "").split(",")
+print(f"Allowed CORS origins: {CORS_ORIGINS}")
 
 # Initialize the FastAPI app
 app = FastAPI()
@@ -28,7 +29,7 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[origin.strip() for origin in CORS_ORIGINS], 
+    allow_origins=["http://3.142.114.5"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
