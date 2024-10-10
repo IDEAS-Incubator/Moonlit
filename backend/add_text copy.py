@@ -1,6 +1,4 @@
 from PIL import Image, ImageDraw, ImageFont
-import re
-
 
 def add_text_to_panel(text, panel_image):
     # Generate the text image with the same width as the panel image
@@ -21,10 +19,7 @@ def generate_text_image(text, max_width):
 
     # Load a font that supports multilingual characters
     try:
-        if contains_thai(text):
-          font = ImageFont.truetype("NotoSansThai.ttf", 30)  
-        else:
-            font = ImageFont.truetype("NotoSansCJKjp-Regular.ttf", 30)
+        font = ImageFont.truetype("NotoSansCJKjp-Regular.ttf", 30)  # Use Noto Sans CJK for Chinese, Japanese, Korean
     except IOError:
         print("Font file not found. Using default font.")
         font = ImageFont.load_default()
@@ -71,6 +66,3 @@ def wrap_text(draw, text, font, max_width):
     lines.append(current_line)  # Add the last line
     return lines
 
-def contains_thai(text):
-    # Check if the text contains Thai characters
-    return bool(re.search(r'[\u0E00-\u0E7F]', text))

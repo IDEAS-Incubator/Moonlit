@@ -23,6 +23,8 @@ You will also write the text of the panel.
 The text should not be more than 2 small sentences.
 Each sentence should start by the character name
 
+**Important:** The panel description must be in English, but the text must be in {language}.
+
 Example input:
 Characters: Adrien is a guy with blond hair wearing glasses. Vincent is a guy with black hair wearing a hat.
 Adrien and vincent want to start a new product, and they create it in one night before presenting it to the board.
@@ -45,16 +47,17 @@ Split the scenario in 8 parts:
 "
 """
 
-def generate_panels(scenario):
+def generate_panels(scenario, language):
     model = ChatOpenAI(model_name='gpt-4', openai_api_key=api_key)
 
     human_message_prompt = HumanMessagePromptTemplate.from_template(template)
 
     chat_prompt = ChatPromptTemplate.from_messages([human_message_prompt])
 
-    chat_prompt.format_messages(scenario=scenario)
+    # Format the prompt with the scenario and language
+    formatted_prompt = chat_prompt.format_messages(scenario=scenario, language=language)
 
-    result = model(chat_prompt.format_messages(scenario=scenario))
+    result = model(formatted_prompt)
 
     print(result.content)
 

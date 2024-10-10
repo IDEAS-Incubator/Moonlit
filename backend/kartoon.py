@@ -40,40 +40,7 @@ class ScenarioRequest(BaseModel):
     scenario: str
     style: str
     email: str 
-
-# Define the API endpoint for generating the comic strip
-# @app.post("/generate-comic/")
-# async def generate_comic(request: ScenarioRequest):
-#     # Extract scenario and style from the request
-#     SCENARIO = request.scenario
-#     STYLE = request.style
-
-#     # Generate panels from the scenario
-#     print(f"Generate panels with style '{STYLE}' for this scenario: \n {SCENARIO}")
-#     panels = generate_panels(SCENARIO)
-
-#     # Generate images for each panel and add text
-#     panel_images = []
-#     for panel in panels:
-#         panel_prompt = panel["description"] + ", cartoon box, " + STYLE
-#         print(f"Generate panel {panel['number']} with prompt: {panel_prompt}")
-#         panel_image = text_to_image(panel_prompt)  # Assume this function returns an image
-#         panel_image_with_text = add_text_to_panel(panel["text"], panel_image)
-#         panel_images.append(panel_image_with_text)
-
-#     # Create the comic strip from the generated panels
-#     comic_strip = create_strip(panel_images)
-
-#     # Generate a unique filename using UUID
-#     unique_filename = f"comic_strip_{uuid.uuid4()}.pdf"
-#     pdf_filename = os.path.join("output", unique_filename)
-
-#     # Save the PDF to disk
-#     comic_strip.save(pdf_filename, format="PDF")
-#     print(f"Comic strip saved to {pdf_filename}")
-
-#     # Return a download link
-#     return {"download_url": f"/download/{unique_filename}", "view_url": f"/view/{unique_filename}"}
+    language: str
 
 # Define a route for downloading the PDF
 @app.get("/download/{filename}")
@@ -128,9 +95,10 @@ async def send_comic_email(request: ScenarioRequest):
     SCENARIO = request.scenario
     STYLE = request.style
     EMAIL = request.email
+    LANGUAGE = request.language
 
     # Generate panels from the scenario (your logic)
-    panels = generate_panels(SCENARIO)
+    panels = generate_panels(SCENARIO, LANGUAGE)
 
     # Generate images for each panel and add text
     panel_images = []
