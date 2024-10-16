@@ -1,76 +1,63 @@
 from PIL import Image, ImageDraw, ImageFont
 import re
 
-
 def add_text_to_panel(text, panel_image):
-    # Generate the text image with the same width as the panel image
-    text_image = generate_text_image(text, panel_image.width)
-
-    # Create a new image that can fit both the panel and the text below it
-    result_image = Image.new('RGB', (panel_image.width, panel_image.height + text_image.height), color='white')
-    result_image.paste(panel_image, (0, 0))  # Paste the panel at the top
-    result_image.paste(text_image, (0, panel_image.height))  # Paste the text below the panel
-
+    # Generate text image based on input text
+    text_image = generate_text_image(text)
+    
+    # Create a new image with extra space for text below the panel
+    result_image = Image.new('RGB', (panel_image.width, panel_image.height + text_image.height))
+    
+    # Paste the original panel and text onto the new image
+    result_image.paste(panel_image, (0, 0))
+    result_image.paste(text_image, (0, panel_image.height))
+    
     return result_image
 
-def generate_text_image(text, max_width):
-    # Define initial dimensions and color for the text image
-    height = 128  # Initial height; this will be adjusted based on text content
-    background_color = 'white'
-    text_color = 'black'
+def generate_text_image(text):
+    width = 1024
+    height = 128
+    
+    # Create a white background for the text
+    image = Image.new('RGB', (width, height), color='white')
+    draw = ImageDraw.Draw(image)
+    
+    # Load an appropriate font
+    font = load_font(text, 30)
+    
+    # Calculate text size and position
+    text_bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = text_bbox[2] - text_bbox[0]
+    text_height = text_bbox[3] - text_bbox[1]
+    x = (width - text_width) // 2
+    y = (height - text_height) // 2
+    
+    # Define text color (black)
+    text_color = (0, 0, 0)
+    
+    # Draw the text
+    draw.text((x, y), text, fill=text_color, font=font)
+    
+    return image
 
-    # Load a font that supports multilingual characters
+def load_font(text, font_size):
+    # Load appropriate font based on the content (handles Thai or other multilingual text)
     try:
         if contains_thai(text):
-          font = ImageFont.truetype("NotoSansThai.ttf", 30)  
+            font = ImageFont.truetype("NotoSansThai.ttf", font_size)  # Ensure this font is installed
         else:
-            font = ImageFont.truetype("NotoSansSC-Regular.ttf", 30)
+            font = ImageFont.truetype("NotoSansSC-Regular.ttf", font_size)  # Fallback for other languages
     except IOError:
         print("Font file not found. Using default font.")
-        font = ImageFont.load_default()
-
-    # Create a temporary image to calculate text dimensions
-    temp_image = Image.new('RGB', (max_width, height), color=background_color)
-    draw = ImageDraw.Draw(temp_image)
-
-    # Wrap text to fit within the specified width
-    wrapped_text = wrap_text(draw, text, font, max_width)
-
-    # Calculate total height needed for the wrapped text
-    text_height = sum([draw.textbbox((0, 0), line, font=font)[3] for line in wrapped_text]) + 20
-    text_image = Image.new('RGB', (max_width, text_height), color=background_color)
-    draw = ImageDraw.Draw(text_image)
-
-    # Draw each line of text centered horizontally
-    y_offset = 10
-    for line in wrapped_text:
-        text_bbox = draw.textbbox((0, 0), line, font=font)
-        line_width = text_bbox[2] - text_bbox[0]
-        line_height = text_bbox[3] - text_bbox[1]
-        x_offset = (max_width - line_width) // 2  # Center the line horizontally
-        draw.text((x_offset, y_offset), line, fill=text_color, font=font)
-        y_offset += line_height
-
-    return text_image
-
-def wrap_text(draw, text, font, max_width):
-    words = text.split()
-    lines = []
-    current_line = ""
-
-    for word in words:
-        test_line = f"{current_line} {word}".strip()
-        width = draw.textbbox((0, 0), test_line, font=font)[2]
-
-        if width <= max_width:
-            current_line = test_line
-        else:
-            lines.append(current_line)
-            current_line = word
-
-    lines.append(current_line)  # Add the last line
-    return lines
+        font = ImageFont.load_default()  # Load default font if custom fonts are unavailable
+    return font
 
 def contains_thai(text):
     # Check if the text contains Thai characters
     return bool(re.search(r'[\u0E00-\u0E7F]', text))
+
+# Example usage:
+# panel_image = Image.open("panel1.png")  # Load an existing image
+# text = "Vincent: I think we need a new product.\nAdrien: Let's brainstorm some ideas."
+# result = add_text_to_panel(text, panel_image)
+# result.save('panel1-text.png')
