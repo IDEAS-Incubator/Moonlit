@@ -24,7 +24,7 @@ def generate_text_image(text, max_width):
         if contains_thai(text):
           font = ImageFont.truetype("NotoSansThai.ttf", 30)  
         else:
-            font = ImageFont.truetype("NotoSansCJKjp-Regular.ttf", 30)
+            font = ImageFont.truetype("NotoSansSC-Regular.ttf", 30)
     except IOError:
         print("Font file not found. Using default font.")
         font = ImageFont.load_default()
