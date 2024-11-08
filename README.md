@@ -1,4 +1,4 @@
-# ComicDreams Deployment
+# Moonlit Deployment
 
 ## AWS EC2 Instance Setup
 
