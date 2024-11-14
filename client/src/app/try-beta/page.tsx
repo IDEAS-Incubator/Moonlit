@@ -15,6 +15,7 @@ export default function TryBetaPage() {
   const [scenario, setScenario] = useState('');
   const [style, setStyle] = useState('');
   const [language, setLanguage] = useState('');
+  const [layout, setLayout] = useState('');
   const [downloadLink, setDownloadLink] = useState<string | null>(null);
   const [viewLink, setViewLink] = useState<string | null>(null);  
   const [loading, setLoading] = useState(false);
@@ -36,6 +37,7 @@ export default function TryBetaPage() {
 
   const styles = ["Anime", "Belgium Comic", "Manga", "American Comic", "Bedtime E-Book"];
   const languages = ["English", "Chinese", "Thailand", "Japanese"];
+  const layouts = [1,2];
 
   const countWords = (text: string) => text.trim().split(/\s+/).length;
   const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -54,7 +56,7 @@ export default function TryBetaPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!email || !scenario || !style || !language) {
+    if (!email || !scenario || !style || !language || !layout) {
       toast.error("All fields must be filled.");
       return;
     }
@@ -77,7 +79,7 @@ export default function TryBetaPage() {
       const response = await fetch(`${API_URL}/send_comic_email/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scenario, style, email, language }),
+        body: JSON.stringify({ scenario, style, email, language,layout }),
       });
 
       const data = await response.json();
@@ -153,6 +155,16 @@ export default function TryBetaPage() {
               <option value="">Select Language</option>
               {languages.map((lang) => (
                 <option key={lang} value={lang}>{lang}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="layout" className="block text-sm font-medium mb-2">Layout</label>
+            <select id="layout" value={layout} onChange={(e) => setLayout(e.target.value)} className="w-full p-2 border rounded-md">
+              <option value="">Select Layout</option>
+              {layouts.map((layoutOption) => (
+                <option key={layoutOption} value={layoutOption}>{layoutOption}</option>
               ))}
             </select>
           </div>

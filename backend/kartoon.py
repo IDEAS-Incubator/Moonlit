@@ -29,8 +29,8 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[origin.strip() for origin in CORS_ORIGINS], 
-    # allow_origins=["http://127.0.0.1", "http://localhost"],
+    # allow_origins=[origin.strip() for origin in CORS_ORIGINS], 
+    allow_origins=["http://127.0.0.1", "http://localhost"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -42,6 +42,7 @@ class ScenarioRequest(BaseModel):
     style: str
     email: str 
     language: str
+    layout: int
 
 # Define a route for downloading the PDF
 @app.get("/download/{filename}")
@@ -97,8 +98,9 @@ async def send_comic_email(request: ScenarioRequest):
     STYLE = request.style
     EMAIL = request.email
     LANGUAGE = request.language
+    LAYOUT = request.layout  # Default to two images per page
 
-    # Generate panels from the scenario (your logic)
+    # Generate panels from the scenario
     panels = generate_panels(SCENARIO, LANGUAGE)
 
     # Generate images for each panel and add text
@@ -109,23 +111,19 @@ async def send_comic_email(request: ScenarioRequest):
         panel_image_with_text = add_text_to_panel(panel["text"], panel_image)
         panel_images.append(panel_image_with_text)
 
-    # Create the comic strip from the generated panels
-    comic_strip = create_strip(panel_images)
-
     # Ensure the output directory exists
     output_dir = os.path.join("output")
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)  # Create the directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)  # Ensure the directory exists
 
     # Generate a unique filename using UUID
     unique_filename = f"comic_strip_{uuid.uuid4()}.pdf"
     pdf_filename = os.path.join(output_dir, unique_filename)
 
-    # Save the PDF to disk
-    comic_strip.save(pdf_filename, format="PDF")
+    # Create and save the comic strip as a multi-page PDF
+    create_strip(panel_images, layout=LAYOUT, border_size=10, output_pdf_path=pdf_filename)
     print(f"Comic strip saved to {pdf_filename}")
 
-    # Send the PDF as an email attachment (your logic for sending email)
+    # Send the PDF as an email attachment
     if not send_email_with_attachment(EMAIL, pdf_filename):
         raise HTTPException(status_code=500, detail="Failed to send email")
 
