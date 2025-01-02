@@ -1,4 +1,4 @@
-# Moonlit Deployment
+# Moonlit
 
 ## AWS EC2 Instance Setup
 
