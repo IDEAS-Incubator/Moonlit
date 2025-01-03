@@ -1,79 +1,57 @@
-import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { cn } from "@/lib/utils";
-// Utility function to merge class names
-// Define inline styles for the button variants and sizes
-const buttonVariants = (variant?: string, size?: string) => {
-  const styles: Record<string, React.CSSProperties> = {
-    default: {
-      backgroundColor: "#1d4ed8", // Primary color (e.g., blue)
-      color: "#ffffff",           // Primary foreground color (e.g., white)
-      border: "none",
-    },
-    destructive: {
-      backgroundColor: "#dc2626", // Destructive color (e.g., red)
-      color: "#ffffff",
-      border: "none",
-    },
-    outline: {
-      border: "1px solid #e5e7eb", // Border (e.g., light gray)
-      backgroundColor: "#ffffff",
-      color: "#111827",            // Text color (e.g., dark gray)
-    },
-    secondary: {
-      backgroundColor: "#6b7280", // Secondary color (e.g., gray)
-      color: "#ffffff",
-      border: "none",
-    },
-    ghost: {
-      backgroundColor: "transparent",
-      color: "#111827",            // Text color (e.g., dark gray)
-      border: "none",
-    },
-    link: {
-      textDecoration: "underline",
-      color: "#1d4ed8",            // Link color (e.g., blue)
-      backgroundColor: "transparent",
-      border: "none",
-    },
-  };
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
 
-  const sizes: Record<string, React.CSSProperties> = {
-    default: { height: "2.5rem", padding: "0.5rem 1rem" }, // Default size
-    sm: { height: "2.25rem", padding: "0.5rem 0.75rem" },  // Small size
-    lg: { height: "2.75rem", padding: "0.5rem 2rem" },     // Large size
-    icon: { height: "2.5rem", width: "2.5rem" },           // Icon size
-  };
+import { cn } from "@/lib/utils"
 
-  return {
-    ...styles[variant || "default"],
-    ...sizes[size || "default"],
-  };
-};
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  {
+    variants: {
+      variant: {
+        default:
+          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-9 px-4 py-2",
+        sm: "h-8 rounded-md px-3 text-xs",
+        lg: "h-10 rounded-md px-8",
+        icon: "h-9 w-9",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
-  size?: "default" | "sm" | "lg" | "icon";
-  asChild?: boolean;
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "default", size = "default", asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
-    const buttonStyle = buttonVariants(variant, size);
-
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
     return (
       <Comp
-        style={buttonStyle}
-        className={cn(className)} // Keep custom classNames if any
+        className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
       />
-    );
+    )
   }
-);
+)
+Button.displayName = "Button"
 
-Button.displayName = "Button";
-
-export { Button };
+export { Button, buttonVariants }

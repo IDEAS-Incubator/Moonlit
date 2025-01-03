@@ -1,5 +1,5 @@
 "use client";
-import { SetStateAction, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Footer from '@/components/Footer';
@@ -9,8 +9,42 @@ import '../../styles/global.css';
 import { toast, Toaster } from 'react-hot-toast';
 import { FiRefreshCw } from 'react-icons/fi';
 
+import { AppDispatch, RootState } from '@/lib/store/store';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { setToken } from '@/lib/store/features/user/user';
+import { useRouter } from 'next/navigation';
+
 export default function TryBetaPage() {
   
+  const router = useRouter()
+  const dispatch = useDispatch<AppDispatch>()
+  const auth = useSelector((state: RootState) => state.auth)
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    const pathname = window.location.pathname // Get the current path
+
+    // Skip redirection for reset password route
+    if (pathname.startsWith('/reset-password/') || pathname.startsWith("/complete-signup/")) {
+      return
+    }
+
+
+    if (!token) {
+      router.replace('/login') // Redirect to login if token is missing
+      return
+    }
+
+    // Set token in Redux store if not already present
+    if (!auth.token) {
+      dispatch(setToken(token))
+    }
+  }, [dispatch, auth.token, router])
+
+
+
+
   const [email, setEmail] = useState('');
   const [scenario, setScenario] = useState('');
   const [style, setStyle] = useState('');
@@ -99,7 +133,7 @@ export default function TryBetaPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <Toaster position="top-right" />
-      <Header />
+      {/* <Header /> */}
       <main className="container mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-12 text-center">Try Moonlit Beta</h1>
 

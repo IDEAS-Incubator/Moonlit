@@ -161,3 +161,45 @@ pip install -r requirements.txt
 sudo env "PATH=$PATH" npm install -g pm2
 pm2 start kartoon.py --interpreter python3
 ```
+
+### Server Setup:
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/bayesianinstitute/moonlit.git
+```
+
+2. Set environment variables:
+
+```bash
+cd moonlit/backend
+nano .env
+```
+
+In the .env
+
+```bash
+STABILITY_KEY=
+OPENAI_API_KEY=
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_USER=
+EMAIL_PASS=
+CORS_ORIGINS=
+```
+
+3. Create and activate virtual environment:
+
+```bash
+python -m venv env
+source env/bin/activate
+pip install -r requirements.txt
+```
+
+4. Start server:
+
+```bash
+sudo env "PATH=$PATH" npm install -g pm2
+pm2 start kartoon.py --interpreter python3
+```
