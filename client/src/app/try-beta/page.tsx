@@ -3,7 +3,7 @@ import { SetStateAction, useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Footer from '@/components/Footer';
-import Header from '@/components/Header';
+
 import { Modal } from '@/components/Modal'; 
 import '../../styles/global.css'; 
 import { toast, Toaster } from 'react-hot-toast';

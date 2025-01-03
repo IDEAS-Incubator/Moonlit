@@ -1,4 +1,3 @@
-import Header from '@/components/Header'
 import TestimonialsSection from '@/components/TestimonialsSection'
 
 import Footer from '@/components/Footer'
