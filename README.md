@@ -203,3 +203,43 @@ pip install -r requirements.txt
 sudo env "PATH=$PATH" npm install -g pm2
 pm2 start kartoon.py --interpreter python3
 ```
+
+#### User Management:
+
+1. Set environment variables:
+
+```bash
+cd moonlit/user
+nano .env
+```
+
+In the .env
+
+```bash
+# Application Configuration
+HOST=
+PORT=
+SITE_URL=
+SITE_PORT=
+
+# Database Configuration
+MONGODB_URL=
+
+# Email Configuration
+MAIL_EMAIL=
+MAIL_SECRET=
+MAIL_SERVICE=
+
+# JWT Configuration
+JWT_SECRET="afaan"
+
+# Monitor Configuration
+MONITOR_EMAIL=
+```
+
+2. Start server:
+
+```bash
+npm install
+pm2 start npm --name "client" -- run dev
+```
