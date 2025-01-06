@@ -13,11 +13,27 @@ export default function CompleteSignupPage() {
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [phoneError, setPhoneError] = useState('') // State to track phone validation error
   const router = useRouter()
   const { token } = useParams() // Capture token from the dynamic route
 
+  const validatePhone = (phone: string) => {
+    const phoneRegex = /^[+]?[0-9]{10,15}$/ // Allows optional '+' and 10-15 digits
+    if (!phoneRegex.test(phone)) {
+      setPhoneError('Invalid phone number. Use only digits and optional +. Min 10 digits.')
+      return false
+    }
+    setPhoneError('')
+    return true
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!validatePhone(phone)) {
+      toast.error('Please fix the phone number before submitting.')
+      return
+    }
 
     setIsLoading(true)
 
@@ -76,9 +92,13 @@ export default function CompleteSignupPage() {
                   id="phone"
                   type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => {
+                    setPhone(e.target.value)
+                    validatePhone(e.target.value)
+                  }}
                   required
                 />
+                {phoneError && <p className="text-red-500 text-sm">{phoneError}</p>}
               </div>
             </div>
             <Button className="w-full mt-6" type="submit" disabled={isLoading}>
