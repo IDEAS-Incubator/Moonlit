@@ -22,25 +22,54 @@ export default function TryBetaPage() {
   const auth = useSelector((state: RootState) => state.auth)
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const pathname = window.location.pathname // Get the current path
+    const checkSubscription = async () => {
+      const token = localStorage.getItem("token");
 
-    // Skip redirection for reset password route
-    if (pathname.startsWith('/reset-password/') || pathname.startsWith("/complete-signup/")) {
-      return
-    }
+      if (!token) {
+        toast.error("Please log in to access this page.");
+        router.replace("/login");
+        return;
+      }
 
+      if (!auth.token) {
+        dispatch(setToken(token));
+      }
 
-    if (!token) {
-      router.replace('/login') // Redirect to login if token is missing
-      return
-    }
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/user/subscription-status?userId=${auth.userId}`,
+          {
+            method: "GET",
+          }
+        );
+        
+        const data = await response.json();
 
-    // Set token in Redux store if not already present
-    if (!auth.token) {
-      dispatch(setToken(token))
-    }
-  }, [dispatch, auth.token, router])
+        if (!response.ok || !data.subscription) {
+          toast.error("No active subscription found.");
+          router.replace("/subscriptions"); // Redirect if no subscription
+          return;
+        }
+
+        const currentDate = new Date();
+        const endDate = new Date(data.subscription.endDate);
+
+        if (endDate < currentDate) {
+          toast.error("Your subscription has expired.");
+          router.replace("/subscriptions"); // Redirect if subscription expired
+        } else {
+          toast.success("Subscription active. Welcome back!");
+        }
+      } catch (error) {
+        console.error("Error checking subscription:", error);
+        toast.error("Failed to verify subscription.");
+        router.replace("/subscriptions");
+      }
+    };
+
+    checkSubscription();
+  }, [auth.token, dispatch, router]);
+
 
 
 

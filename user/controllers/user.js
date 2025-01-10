@@ -1,11 +1,17 @@
-import { PendingUser, User } from "../models/user.js";
-
+import { PendingUser, User,Subscription } from "../models/user.js";
+import { verifyWebhookEvent } from "../utils/verifyWebhook.js";
+import { buffer } from "micro"; // For handling raw body
 import { TryCatch } from "../middleware/error.js";
 import ErrorHandler from "../utils/utitlity.js";
 import { generateToken } from "../middleware/auth.js";
 import bcrypt from "bcrypt";
 import { sendVerificationEmail,sendVerificationEmailSignup } from "../mail/send.js";
 
+export const config = {
+  api: {
+    bodyParser: false, // Required for raw body
+  },
+};
 
 export const Login = async (req, res, next) => {
   const { email, password } = req.body;
@@ -398,3 +404,158 @@ export const updateProfile = TryCatch(async (req, res, next) => {
   });
 });
 
+
+
+// export const createSubscription = TryCatch(async (req, res, next) => {
+//   const { planType, paypalSubscriptionId, userId } = req.body;
+
+//   // Validate required fields
+//   if (!planType || !paypalSubscriptionId || !userId) {
+//     return next(new ErrorHandler("All fields are required: planType, paypalSubscriptionId, userId", 400));
+//   }
+
+//   // Calculate the subscription end date based on the plan type
+//   const endDate = new Date(
+//     Date.now() + (planType === "monthly" ? 30 : 365) * 24 * 60 * 60 * 1000
+//   );
+
+//   // Create or update the subscription in the database
+//   let subscription = await Subscription.findOne({ paypalSubscriptionId });
+
+//   if (subscription) {
+//     // Update existing subscription
+//     subscription.status = "active";
+//     subscription.planType = planType;
+//     subscription.startDate = new Date();
+//     subscription.endDate = endDate;
+//   } else {
+//     // Create a new subscription
+//     subscription = new Subscription({
+//       userId,
+//       planType,
+//       paypalSubscriptionId,
+//       status: "active",
+//       startDate: new Date(),
+//       endDate,
+//     });
+//   }
+
+//   await subscription.save();
+
+//   // Send success response
+//   res.status(201).json({
+//     success: true,
+//     message: "Subscription created or updated successfully",
+//     data: subscription,
+//   });
+// });
+
+
+// export const handlePayPalWebhook = TryCatch(async (req, res, next) => {
+//   console.log("Entered webhook");
+
+//   // Capture raw body
+//   const rawBody = await buffer(req);
+//   const headers = req.headers;
+
+//   // Log all headers
+//   console.log("Headers:", headers);
+
+//   // Log the raw body as a string
+//   console.log("Raw Body:", rawBody.toString());
+
+//   // Attempt to parse the body into JSON and log it
+//   let parsedBody;
+//   try {
+//     parsedBody = JSON.parse(rawBody);
+//     console.log("Parsed Body:", parsedBody);
+//   } catch (error) {
+//     console.error("Error parsing webhook body:", error);
+//     // Reply to PayPal that the JSON payload is invalid
+//     return res.status(400).json({ success: false, message: "Invalid JSON payload" });
+//   }
+
+//   // Verify the webhook event
+//   const isValid = await verifyWebhookEvent(
+//     rawBody,
+//     headers,
+//     process.env.PAYPAL_WEBHOOK_ID // Ensure this is set in your environment variables
+//   );
+
+//   if (!isValid) {
+//     console.error("Invalid webhook event");
+//     // Reply to PayPal with an error
+//     return res.status(400).json({ success: false, message: "Invalid webhook signature" });
+//   }
+
+//   console.log("Webhook signature verified");
+
+//   // Extract event type and resource
+//   const { event_type, resource } = parsedBody;
+
+//   // Log event type and resource
+//   console.log("Event Type:", event_type);
+//   console.log("Resource:", resource);
+
+//   if (!event_type || !resource) {
+//     // Reply to PayPal with an error
+//     return res.status(400).json({ success: false, message: "Invalid webhook payload" });
+//   }
+
+//   const subscriptionId = resource.id; // PayPal Subscription ID
+//   console.log("Subscription ID:", subscriptionId);
+
+//   // Find the subscription in the database
+//   let subscription = await Subscription.findOne({ paypalSubscriptionId: subscriptionId });
+
+//   if (!subscription) {
+//     console.error(`Subscription not found: ${subscriptionId}`);
+//     // Reply to PayPal with a 404 if the subscription does not exist
+//     return res.status(404).json({ success: false, message: "Subscription not found" });
+//   }
+
+//   console.log("Subscription before event processing:", subscription);
+
+//   // Process the event and update the subscription
+//   switch (event_type) {
+//     case "BILLING.SUBSCRIPTION.ACTIVATED":
+//       subscription.status = "active";
+//       console.log(`Subscription activated: ${subscriptionId}`);
+//       break;
+
+//     case "BILLING.SUBSCRIPTION.PAYMENT.SUCCEEDED":
+//       subscription.status = "active";
+//       subscription.endDate = new Date(
+//         subscription.endDate.getTime() +
+//         (subscription.planType === "monthly" ? 30 : 365) * 24 * 60 * 60 * 1000
+//       );
+//       console.log(`Payment succeeded for subscription: ${subscriptionId}`);
+//       break;
+
+//     case "BILLING.SUBSCRIPTION.CANCELLED":
+//       subscription.status = "cancelled";
+//       console.log(`Subscription cancelled: ${subscriptionId}`);
+//       break;
+
+//     case "BILLING.SUBSCRIPTION.EXPIRED":
+//       subscription.status = "expired";
+//       console.log(`Subscription expired: ${subscriptionId}`);
+//       break;
+
+//     case "PAYMENT.SALE.COMPLETED":
+//       console.log(`Payment completed for subscription: ${subscriptionId}`);
+//       break;
+
+//     default:
+//       console.log(`Unhandled PayPal event: ${event_type}`);
+//   }
+
+//   // Save the updated subscription
+//   await subscription.save();
+//   console.log("Subscription after event processing:", subscription);
+
+//   // Reply to PayPal that the event was processed successfully
+//   res.status(200).json({ success: true, message: "Webhook processed successfully" });
+
+//   console.log("Replied to PayPal with success");
+// });
