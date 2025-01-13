@@ -1,0 +1,63 @@
+@startuml
+
+entity Users {
+  * _id : ObjectId
+  * email : String
+  * password : String
+  * firstname : String
+  * lastname : String
+  * phone : String
+  * keywords : Array
+  * createdAt : Date
+  * updatedAt : Date
+}
+
+entity PendingUsers {
+  * _id : ObjectId
+  * email : String
+  * verificationToken : String
+  * createdAt : Date
+}
+
+entity Payments {
+  * _id : ObjectId
+  * userId : ObjectId
+  * captureId : String
+  * status : String
+  * amount : Number
+  * currency : String
+  * payer.name : String
+  * payer.email : String
+  * payer.payerId : String
+  * payer.country : String
+  * shipping.fullName : String
+  * shipping.addressLine1 : String
+  * shipping.city : String
+  * shipping.state : String
+  * shipping.postalCode : String
+  * shipping.countryCode : String
+  * createTime : Date
+  * updateTime : Date
+  * endDate : Date
+}
+
+entity Subscriptions {
+  * _id : ObjectId
+  * userId : ObjectId
+  * planType : String
+  * paypalSubscriptionId : String
+  * status : String
+  * startDate : Date
+  * endDate : Date
+  * createdAt : Date
+  * updatedAt : Date
+}
+
+' 1-to-1 Relationship
+Users ||--|| PendingUsers : "can have"
+
+' 1-to-Many Relationship
+Users ||--o{ Payments : "makes"
+Users ||--o{ Subscriptions : "has"
+
+@enduml
