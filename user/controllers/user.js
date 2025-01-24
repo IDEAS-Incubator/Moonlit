@@ -167,7 +167,47 @@ export const completeUser = TryCatch(async (req, res, next) => {
   });
 });
 
+// Signup Controller
+export const signupApp = TryCatch(async (req, res, next) => {
+  const { email, password, name, phone } = req.body;
 
+  // Validate required fields
+  if (!email || !password || !name || !phone) {
+    return next(new ErrorHandler('All fields (email, password, name, phone) are required', 400));
+  }
+
+  // Check if the user already exists
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return next(new ErrorHandler('User with this email already exists', 409));
+  }
+
+  // Hash the password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Create a new user instance
+  const newUser = new User({
+    email,
+    password: hashedPassword,
+    name,
+    phone,
+  });
+
+  // Save the user in the database
+  await newUser.save();
+
+  // Send success response
+  res.status(201).json({
+    success: true,
+    message: 'Signup successful!',
+    data: {
+      email: newUser.email,
+      name: newUser.name,
+      phone: newUser.phone,
+      createdAt: newUser.createdAt,
+    },
+  });
+});
 
 export const ForgotRequest = TryCatch(async (req, res, next) => {
   const { email } = req.body;
