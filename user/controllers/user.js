@@ -1,10 +1,10 @@
-import { PendingUser, User } from "../models/user.js";
+import { PendingUser, User, ResetCode } from "../models/user.js";
 
 import { TryCatch } from "../middleware/error.js";
 import ErrorHandler from "../utils/utitlity.js";
 import { generateToken } from "../middleware/auth.js";
 import bcrypt from "bcrypt";
-import { sendVerificationEmail,sendVerificationEmailSignup } from "../mail/send.js";
+import { sendVerificationEmail,sendVerificationEmailSignup, sendResetCodeEmail } from "../mail/send.js";
 
 
 export const Login = async (req, res, next) => {
@@ -51,6 +51,8 @@ export const Login = async (req, res, next) => {
       data: { token: token, user: user },
     });
 };
+
+
 
 export const getUser = TryCatch(async (req, res, next) => {
   // Extract user ID from request parameters
@@ -395,6 +397,126 @@ export const updateProfile = TryCatch(async (req, res, next) => {
     success: true,
     message: "Profile updated successfully",
     data: updatedUser,
+  });
+});
+
+
+
+// Signup Controller
+export const signupApp = TryCatch(async (req, res, next) => {
+  const { email, password, name, phone } = req.body;
+
+  // Validate required fields
+  if (!email || !password || !name || !phone) {
+    return next(new ErrorHandler('All fields (email, password, name, phone) are required', 400));
+  }
+
+  // Check if the user already exists
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return next(new ErrorHandler('User with this email already exists', 409));
+  }
+
+  // Hash the password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Create a new user instance
+  const newUser = new User({
+    email,
+    password: hashedPassword,
+    name,
+    phone,
+  });
+
+  // Save the user in the database
+  await newUser.save();
+
+  // Send success response
+  res.status(201).json({
+    success: true,
+    message: 'Signup successful!',
+    data: {
+      email: newUser.email,
+      name: newUser.name,
+      phone: newUser.phone,
+      createdAt: newUser.createdAt,
+    },
+  });
+});
+
+export const sendEmailCode = TryCatch(async (req, res, next) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return next(new ErrorHandler("Email is required", 400));
+  }
+
+  // Find user by email
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(new ErrorHandler("User not found with this email", 404));
+  }
+
+  // Generate 6 digit code
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+  // Create or update reset code
+  await ResetCode.findOneAndUpdate(
+    { email },
+    { 
+      userId: user._id,
+      email,
+      code,
+      createdAt: new Date()
+    },
+    { upsert: true, new: true }
+  );
+
+  // Send email with code
+  await sendResetCodeEmail(email, code);
+
+  res.status(200).json({
+    success: true,
+    message: "Reset code sent to your email"
+  });
+});
+
+export const ResetPasswordApp = TryCatch(async (req, res, next) => {
+  const { email, code, newPassword } = req.body;
+
+  if (!email || !code || !newPassword) {
+    return next(new ErrorHandler("Email, code and new password are required", 400));
+  }
+
+  // Find the reset code
+  const resetCodeDoc = await ResetCode.findOne({ email, code });
+  if (!resetCodeDoc) {
+    return next(new ErrorHandler("Invalid or expired reset code", 400));
+  }
+
+  // Find user
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  // Hash new password
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  // Update user's password
+  user.password = hashedPassword;
+  await user.save();
+
+  // Delete the used reset code
+  await ResetCode.deleteOne({ _id: resetCodeDoc._id });
+
+  // Generate new token
+  const token = generateToken({ email: user.email, userId: String(user._id) });
+
+  res.status(200).json({
+    success: true,
+    message: "Password reset successful",
+    data: { token }
   });
 });
 

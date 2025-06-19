@@ -95,3 +95,29 @@ export const sendErrorEmail = (error) => {
         }
     });
 };
+
+export const sendResetCodeEmail = (email, code) => {
+    const templatePath = path.resolve(process.cwd(), 'views', 'mail.html');
+
+    // Read HTML template from file
+    fs.readFile(templatePath, 'utf8', (err, html) => {
+        if (err) {
+            console.error('Error reading HTML template file:', err);
+            return;
+        }
+
+        // Replace placeholders with dynamic content
+        const updatedHtml = html
+            .replace("[URL]", "#") // No URL needed for code-based reset
+            .replace("[TITLE]", "Password Reset Code")
+            .replace("[CONTENT]", `Your password reset code is: <strong>${code}</strong><br><br>This code will expire in 5 minutes.`)
+            .replace("[BTN_NAME]", "Code: " + code);
+
+        // Send email with dynamic HTML content
+        sendEmail({
+            to: email,
+            subject: `Moonlit - Password Reset Code`,
+            html: updatedHtml,
+        });
+    });
+};
